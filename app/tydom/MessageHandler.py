@@ -247,6 +247,8 @@ device_conso_keywords = device_conso_classes.keys()
 
 deviceSmokeKeywords = ['techSmokeDefect']
 
+deviceWaterKeywords = ['techWaterDefect']
+
 # Device dict for parsing
 device_name = dict()
 device_endpoint = dict()
@@ -405,6 +407,11 @@ class MessageHandler:
                 device_type[device_unique_id] = 'boiler'
                 device_endpoint[device_unique_id] = i["id_endpoint"]
 
+            if i["last_usage"] == 'sensorDF':
+                device_name[device_unique_id] = i["name"]
+                device_type[device_unique_id] = 'water'
+                device_endpoint[device_unique_id] = i["id_endpoint"]
+
             if i["last_usage"] == 'sensorDFR':
                 device_name[device_unique_id] = i["name"]
                 device_type[device_unique_id] = 'smoke'
@@ -491,6 +498,7 @@ class MessageHandler:
                 attr_gate = {}
                 attr_boiler = {}
                 attr_sh_hvac = {}
+                attr_water = {}
                 attr_smoke = {}
                 endpoint_id = endpoint["id"]
                 unique_id = str(endpoint_id) + "_" + str(device_id)
@@ -508,15 +516,13 @@ class MessageHandler:
                     element_name = elem["name"]
                     element_value = elem["value"]
                     element_validity = elem["validity"]
-                    print_id = name_of_id if len(
-                        name_of_id) != 0 else device_id
+                    print_id = name_of_id if len(name_of_id) != 0 else device_id
 
                     if type_of_id == 'light':
                         if element_name in deviceLightKeywords and element_validity == 'upToDate':
                             attr_light['device_id'] = device_id
                             attr_light['endpoint_id'] = endpoint_id
-                            attr_light['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
+                            attr_light['id'] = str(device_id) + '_' + str(endpoint_id)
                             attr_light['light_name'] = print_id
                             attr_light['name'] = print_id
                             attr_light['device_type'] = 'light'
@@ -526,8 +532,7 @@ class MessageHandler:
                         if element_name in deviceCoverKeywords and element_validity == 'upToDate':
                             attr_cover['device_id'] = device_id
                             attr_cover['endpoint_id'] = endpoint_id
-                            attr_cover['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
+                            attr_cover['id'] = str(device_id) + '_' + str(endpoint_id)
                             attr_cover['cover_name'] = print_id
                             attr_cover['name'] = print_id
                             attr_cover['device_type'] = 'cover'
@@ -540,24 +545,26 @@ class MessageHandler:
                     if type_of_id == 'belmDoor' or type_of_id == 'klineDoor':
                         if element_name in deviceDoorKeywords and element_validity == 'upToDate':
                             attr_door['device_id'] = device_id
+                            attr_door['device_class'] = 'door'
                             attr_door['endpoint_id'] = endpoint_id
-                            attr_door['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
+                            attr_door['id'] = str(device_id) + '_' + str(endpoint_id)
                             attr_door['door_name'] = print_id
                             attr_door['name'] = print_id
                             attr_door['device_type'] = 'sensor'
+                            attr_door['device_class'] = 'door'
                             attr_door['element_name'] = element_name
                             attr_door[element_name] = element_value
 
                     if type_of_id == 'windowFrench' or type_of_id == 'window' or type_of_id == 'windowSliding' or type_of_id == 'klineWindowFrench' or type_of_id == 'klineWindowSliding':
                         if element_name in deviceDoorKeywords and element_validity == 'upToDate':
                             attr_window['device_id'] = device_id
+                            attr_window['device_class'] = 'window'
                             attr_window['endpoint_id'] = endpoint_id
-                            attr_window['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
-                            attr_window['door_name'] = print_id
+                            attr_window['id'] = str(device_id) + '_' + str(endpoint_id)
+                            attr_window['window_name'] = print_id
                             attr_window['name'] = print_id
                             attr_window['device_type'] = 'sensor'
+                            attr_window['device_class'] = 'window'
                             attr_window['element_name'] = element_name
                             attr_window[element_name] = element_value
 
@@ -565,8 +572,7 @@ class MessageHandler:
                         if element_name in deviceBoilerKeywords and element_validity == 'upToDate':
                             attr_boiler['device_id'] = device_id
                             attr_boiler['endpoint_id'] = endpoint_id
-                            attr_boiler['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
+                            attr_boiler['id'] = str(device_id) + '_' + str(endpoint_id)
                             # attr_boiler['boiler_name'] = print_id
                             attr_boiler['name'] = print_id
                             attr_boiler['device_type'] = 'climate'
@@ -586,12 +592,13 @@ class MessageHandler:
                     if type_of_id == 'garage_door' or type_of_id == 'gate':
                         if element_name in deviceSwitchKeywords and element_validity == 'upToDate':
                             attr_gate['device_id'] = device_id
+                            attr_gate['device_class'] = 'garage_door'
                             attr_gate['endpoint_id'] = endpoint_id
-                            attr_gate['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
+                            attr_gate['id'] = str(device_id) + '_' + str(endpoint_id)
                             attr_gate['switch_name'] = print_id
                             attr_gate['name'] = print_id
                             attr_gate['device_type'] = 'switch'
+                            attr_gate['device_class'] = 'garage_door'
                             attr_gate[element_name] = element_value
 
                     if type_of_id == 'conso':
@@ -620,21 +627,30 @@ class MessageHandler:
                         if element_name in deviceShHvacKeywords and element_validity == 'upToDate':
                             attr_sh_hvac['device_id'] = device_id
                             attr_sh_hvac['endpoint_id'] = endpoint_id
-                            attr_sh_hvac['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
+                            attr_sh_hvac['id'] = str(device_id) + '_' + str(endpoint_id)
                             attr_sh_hvac['name'] = print_id
                             attr_sh_hvac['device_type'] = 'sh_hvac'
                             attr_sh_hvac[element_name] = element_value
 
+                    if type_of_id == 'water':
+                        if element_name in deviceWaterKeywords and element_validity == 'upToDate':
+                            attr_water['device_id'] = device_id
+                            attr_water['endpoint_id'] = endpoint_id
+                            attr_water['id'] = str(device_id) + '_' + str(endpoint_id)
+                            attr_water['name'] = print_id
+                            attr_water['device_type'] = 'sensor'
+                            attr_water['device_class'] = 'moisture'
+                            attr_water['element_name'] = element_name
+                            attr_water[element_name] = element_value
+
                     if type_of_id == 'smoke':
                         if element_name in deviceSmokeKeywords and element_validity == 'upToDate':
                             attr_smoke['device_id'] = device_id
-                            attr_smoke['device_class'] = 'smoke'
                             attr_smoke['endpoint_id'] = endpoint_id
-                            attr_smoke['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
+                            attr_smoke['id'] = str(device_id) + '_' + str(endpoint_id)
                             attr_smoke['name'] = print_id
                             attr_smoke['device_type'] = 'sensor'
+                            attr_smoke['device_class'] = 'smoke'
                             attr_smoke['element_name'] = element_name
                             attr_smoke[element_name] = element_value
 
@@ -642,19 +658,21 @@ class MessageHandler:
                         if element_name in deviceMotionKeywords and element_validity == 'upToDate':
                             attr_ukn['device_id'] = device_id
                             attr_ukn['endpoint_id'] = endpoint_id
-                            attr_ukn['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
+                            attr_ukn['id'] = str(device_id) + '_' + str(endpoint_id)
                             attr_ukn['name'] = print_id
                             attr_ukn['device_type'] = 'sensor'
+                            attr_ukn['device_class'] = 'motion'
                             attr_ukn['element_name'] = element_name
                             attr_ukn[element_name] = element_value
                         elif element_name in deviceDoorKeywords and element_validity == 'upToDate':
                             attr_ukn['device_id'] = device_id
+                            attr_ukn['device_class'] = 'door'
                             attr_ukn['endpoint_id'] = endpoint_id
                             attr_ukn['id'] = str(
                                 device_id) + '_' + str(endpoint_id)
                             attr_ukn['name'] = print_id
                             attr_ukn['device_type'] = 'sensor'
+                            attr_ukn['device_class'] = 'door'
                             attr_ukn['element_name'] = element_name
                             attr_ukn[element_name] = element_value
 
@@ -662,8 +680,7 @@ class MessageHandler:
                         if element_name in deviceLightKeywords and element_validity == 'upToDate':
                             attr_light['device_id'] = device_id
                             attr_light['endpoint_id'] = endpoint_id
-                            attr_light['id'] = str(
-                                device_id) + '_' + str(endpoint_id)
+                            attr_light['id'] = str(device_id) + '_' + str(endpoint_id)
                             attr_light['light_name'] = print_id
                             attr_light['name'] = print_id
                             # later replace with commented condition below
@@ -713,6 +730,12 @@ class MessageHandler:
                     tydom_attributes=attr_gate,
                     mqtt=self.mqtt_client)
                 await new_gate.update()
+            elif 'device_type' in attr_water and attr_water['device_type'] == 'sensor':
+                new_water = Sensor(
+                    elem_name=attr_water['element_name'],
+                    tydom_attributes_payload=attr_water,
+                    mqtt=self.mqtt_client)
+                await new_water.update()
             elif 'device_type' in attr_smoke and attr_smoke['device_type'] == 'sensor':
                 new_smoke = Sensor(
                     elem_name=attr_smoke['element_name'],
