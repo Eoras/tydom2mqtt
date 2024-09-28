@@ -108,9 +108,7 @@ class Sensor:
     async def setup(self):
         self.device = {
             'manufacturer': 'Delta Dore',
-            'name': self.parent_device_name,
-            'identifiers': self.parent_device_id
-        }
+            'identifiers': self.parent_device_id}
 
         self.config_sensor_topic = sensor_config_topic.format(id=self.id)
 
